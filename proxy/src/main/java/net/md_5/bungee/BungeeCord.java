@@ -432,7 +432,30 @@ public class BungeeCord extends ProxyServer
         }
         isRunning = false;
 
+        getLogger().info( "Stopping Listeners..." );
         stopListeners();
+
+        getLogger().info( "Disabling the AutoTransfer Plugin..." );
+        for ( Plugin plugin : Lists.reverse( new ArrayList<>( pluginManager.getPlugins() ) ) )
+        {
+            if ( plugin.toString().contains( "AutoSelfTransfer" ) )
+            {
+                try
+                {
+                    plugin.onDisable();
+                    for ( Handler handler : plugin.getLogger().getHandlers() )
+                    {
+                        handler.close();
+                    }
+                } catch ( Throwable t )
+                {
+                    getLogger().log( Level.SEVERE, "Exception disabling plugin " + plugin.getDescription().getName(), t );
+                }
+                getScheduler().cancel( plugin );
+                plugin.getExecutorService().shutdownNow();
+            }
+        }
+
         getLogger().info( "Closing pending connections" );
 
         connectionLock.readLock().lock();
