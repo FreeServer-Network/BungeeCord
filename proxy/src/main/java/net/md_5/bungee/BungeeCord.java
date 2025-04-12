@@ -431,10 +431,6 @@ public class BungeeCord extends ProxyServer
             return;
         }
         isRunning = false;
-
-        getLogger().info( "Stopping Listeners..." );
-        stopListeners();
-
         getLogger().info( "Disabling the AutoTransfer Plugin..." );
         for ( Plugin plugin : Lists.reverse( new ArrayList<>( pluginManager.getPlugins() ) ) )
         {
@@ -455,6 +451,8 @@ public class BungeeCord extends ProxyServer
                 plugin.getExecutorService().shutdownNow();
             }
         }
+        getLogger().info( "Stopping Listeners..." );
+        stopListeners();
 
         getLogger().info( "Closing pending connections" );
 
