@@ -17,6 +17,7 @@ import net.md_5.bungee.Util;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
+import net.md_5.bungee.api.event.CustomClickEvent;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.event.SettingsChangedEvent;
@@ -33,7 +34,7 @@ import net.md_5.bungee.protocol.packet.ClientChat;
 import net.md_5.bungee.protocol.packet.ClientCommand;
 import net.md_5.bungee.protocol.packet.ClientSettings;
 import net.md_5.bungee.protocol.packet.CookieResponse;
-import net.md_5.bungee.protocol.packet.FinishConfiguration;
+import net.md_5.bungee.protocol.packet.CustomClickAction;
 import net.md_5.bungee.protocol.packet.KeepAlive;
 import net.md_5.bungee.protocol.packet.LoginAcknowledged;
 import net.md_5.bungee.protocol.packet.LoginPayloadResponse;
@@ -44,6 +45,7 @@ import net.md_5.bungee.protocol.packet.StartConfiguration;
 import net.md_5.bungee.protocol.packet.TabCompleteRequest;
 import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 import net.md_5.bungee.protocol.packet.UnsignedClientCommand;
+import net.md_5.bungee.protocol.util.TagUtil;
 import net.md_5.bungee.util.AllowedCharacters;
 
 public class UpstreamBridge extends PacketHandler
@@ -368,12 +370,6 @@ public class UpstreamBridge extends PacketHandler
     }
 
     @Override
-    public void handle(FinishConfiguration finishConfiguration) throws Exception
-    {
-        con.sendQueuedPackets();
-    }
-
-    @Override
     public void handle(CookieResponse cookieResponse) throws Exception
     {
         con.getPendingConnection().handle( cookieResponse );
@@ -383,6 +379,16 @@ public class UpstreamBridge extends PacketHandler
     public void handle(LoginPayloadResponse loginPayloadResponse) throws Exception
     {
         con.getPendingConnection().handle( loginPayloadResponse );
+    }
+
+    @Override
+    public void handle(CustomClickAction customClickAction) throws Exception
+    {
+        CustomClickEvent event = new CustomClickEvent( con, customClickAction.getId(), TagUtil.toJson( customClickAction.getData() ) );
+        if ( bungee.getPluginManager().callEvent( event ).isCancelled() )
+        {
+            throw CancelSendSignal.INSTANCE;
+        }
     }
 
     @Override
