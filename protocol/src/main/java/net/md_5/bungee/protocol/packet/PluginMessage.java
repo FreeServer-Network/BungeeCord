@@ -62,7 +62,7 @@ public class PluginMessage extends DefinedPacket
     public void read(ByteBuf buf, ProtocolConstants.Direction direction, int protocolVersion)
     {
         tag = ( protocolVersion >= ProtocolConstants.MINECRAFT_1_13 ) ? MODERNISE.apply( readString( buf ) ) : readString( buf, 20 );
-        int maxSize = ( direction == ProtocolConstants.Direction.TO_SERVER ) ? Short.MAX_VALUE : 0x100000;
+        int maxSize = ( direction == ProtocolConstants.Direction.TO_SERVER ) ? ( tag != null && tag.contains( "axiom" ) ) ? 0x100000 : Short.MAX_VALUE : 0x100000;
         Preconditions.checkArgument( buf.readableBytes() <= maxSize, "Payload too large" );
         data = new byte[ buf.readableBytes() ];
         buf.readBytes( data );
