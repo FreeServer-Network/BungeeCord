@@ -276,7 +276,7 @@ public class InitialHandler extends PacketHandler implements PendingConnection
     private ServerPing getPingInfo(String motd, int protocol)
     {
         return new ServerPing(
-                new ServerPing.Protocol( "§b1.8-1.21.5 §f皆可連線", protocol ),
+                new ServerPing.Protocol( "§b1.8-1.21.11 §f皆可連線", protocol ),
                 new ServerPing.Players( listener.getMaxPlayers(), bungee.getOnlineCount(), null ),
                 motd, BungeeCord.getInstance().config.getFaviconObject()
         );
